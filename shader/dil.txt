@@ -1,0 +1,30 @@
+// console commands
+// 'xs dil'
+// 'xs [num] dil' : e.g. 'xs 10 dil'
+
+// shader inputs
+// uniform vec3		iVolumeSize;	// volume size [1-126]
+// uniform float	iColorIndex;	// current color index [1-255]
+// uniform vec3		iMirror;		// current mirror mode [0-1]
+// uniform vec3		iAxis;			// current axis mode [0-1]
+// uniform float	iFrame;			// current frame
+// uniform float	iArgs[8];		// user args
+
+// built-in functions
+// float voxel( vec3 v );			// get voxel color index at position v
+
+// generate new voxel color index at position v
+float map( vec3 v ) {
+	float index = voxel( v );
+	if ( index > 0.5 ) {
+		return index;
+	}
+
+	// dilation
+	float t = ( voxel( v + vec3(  0.0, 0.0,  1.0 ) ) );
+	t = max( t, voxel( v + vec3(  0.0, 0.0, -1.0 ) ) );
+	t = max( t, voxel( v + vec3(  1.0, 0.0,  0.0 ) ) );
+	t = max( t, voxel( v + vec3( -1.0, 0.0,  0.0 ) ) );
+
+	return ( iFrame + iColorIndex  ) * step( 0.5, t );
+}
